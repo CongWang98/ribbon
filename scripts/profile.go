@@ -9,8 +9,8 @@ import (
 
 	_ "net/http/pprof"
 
-	"github.com/fogleman/ribbon/pdb"
-	"github.com/fogleman/ribbon/ribbon"
+	"../pdb"
+	"../ribbon"
 )
 
 func main() {

@@ -5,7 +5,7 @@ import (
 	"math/rand"
 
 	"github.com/fogleman/fauxgl"
-	"github.com/fogleman/ribbon/pdb"
+	"../pdb"
 )
 
 type Camera struct {
@@ -37,11 +37,11 @@ func PositionCamera(model *pdb.Model, matrix fauxgl.Matrix) Camera {
 		if _, ok := r.AtomsByName["CA"]; !ok {
 			continue
 		}
-		if _, ok := r.AtomsByName["O"]; !ok {
-			continue
-		}
+		//if _, ok := r.AtomsByName["O"]; !ok {
+		//	continue
+		//}
 		points = append(points, mat.MulPosition(atomPosition(r.AtomsByName["CA"])))
-		points = append(points, mat.MulPosition(atomPosition(r.AtomsByName["O"])))
+		//points = append(points, mat.MulPosition(atomPosition(r.AtomsByName["O"])))
 	}
 	// }
 	for _, a := range model.HetAtoms {

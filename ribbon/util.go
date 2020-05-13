@@ -4,7 +4,7 @@ import (
 	"strings"
 
 	"github.com/fogleman/fauxgl"
-	"github.com/fogleman/ribbon/pdb"
+	"../pdb"
 )
 
 func atomPosition(a *pdb.Atom) fauxgl.Vector {

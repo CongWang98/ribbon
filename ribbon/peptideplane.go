@@ -2,7 +2,7 @@ package ribbon
 
 import (
 	"github.com/fogleman/fauxgl"
-	"github.com/fogleman/ribbon/pdb"
+	"../pdb"
 )
 
 type PeptidePlane struct {
@@ -23,12 +23,13 @@ func NewPeptidePlane(r1, r2, r3 *pdb.Residue) *PeptidePlane {
 	if _, ok := r2.AtomsByName["CA"]; !ok {
 		return nil
 	}
-	if _, ok := r1.AtomsByName["O"]; !ok {
-		return nil
-	}
+	//if _, ok := r1.AtomsByName["O"]; !ok {
+	//	return nil
+	//}
 	ca1 := atomPosition(r1.AtomsByName["CA"])
 	ca2 := atomPosition(r2.AtomsByName["CA"])
-	o1 := atomPosition(r1.AtomsByName["O"])
+	//o1 := atomPosition(r1.AtomsByName["O"])
+	o1 := fauxgl.Vector{1, 0, 0}
 	a := ca2.Sub(ca1).Normalize()
 	b := o1.Sub(ca1).Normalize()
 	c := a.Cross(b).Normalize()

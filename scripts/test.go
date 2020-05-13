@@ -2,19 +2,19 @@ package main
 
 import (
 	"log"
-
+	"io/ioutil"
+	"fmt"
 	. "github.com/fogleman/fauxgl"
-	"github.com/fogleman/ribbon"
+	"../pdb"
+	"../ribbon"
 	"github.com/nfnt/resize"
+	"time"
+	"strings"
 )
 
 const (
-	scale  = 1
-	width  = 4000 * 1
-	height = 1000 * 1
-	fovy   = 8
-	near   = 1
-	far    = 10
+	size  = 2048
+	scale = 4
 )
 
 var (
@@ -24,39 +24,76 @@ var (
 	light  = V(0.25, 0.25, 0.75).Normalize()
 )
 
+func timed(name string) func() {
+	if len(name) > 0 {
+		fmt.Printf("%s... ", name)
+	}
+	start := time.Now()
+	return func() {
+		fmt.Println(time.Since(start))
+	}
+}
+
 func main() {
-	model, err := ribbon.LoadPDB("examples/test.pdb")
+	pdb_file := "zhongjitest.pdb"
+	file_name := strings.Split(pdb_file,".")[0]
+	data, err := ioutil.ReadFile(pdb_file)
 	if err != nil {
 		log.Fatal(err)
 	}
-
-	mesh := NewEmptyMesh()
-	for _, c := range model.Chains {
-		m := c.Mesh()
-		mesh.Add(m)
+	fmt.Println(string(data))
+	r := strings.NewReader(string(data))
+	models, err := pdb.NewReader(r).ReadAll()
+	if err != nil {
+		log.Fatal(err)
 	}
+	model := models[0]
+	fmt.Printf("atoms       = %d\n", len(model.Atoms))
+	fmt.Printf("residues    = %d\n", len(model.Residues))
+	fmt.Printf("chains      = %d\n", len(model.Chains))
+	fmt.Printf("helixes     = %d\n", len(model.Helixes))
+	fmt.Printf("strands     = %d\n", len(model.Strands))
+	fmt.Printf("het-atoms   = %d\n", len(model.HetAtoms))
+	fmt.Printf("connections = %d\n", len(model.Connections))
+	var done func()
+	done = timed("generating triangle mesh")
+	mesh := ribbon.ModelMesh(model)
+	done()
 
-	mesh.BiUnitCube()
-	// mesh.SmoothNormalsThreshold(Radians(75))
-	mesh.SaveSTL("out.stl")
+	fmt.Printf("triangles   = %d\n", len(mesh.Triangles))
 
-	// create a rendering context
-	context := NewContext(width*scale, height*scale)
-	context.ClearColorBufferWith(HexColor("1D181F"))
+	done = timed("transforming mesh")
+	m := mesh.BiUnitCube()
+	done()
 
-	// create transformation matrix and light direction
-	aspect := float64(width) / float64(height)
-	matrix := LookAt(eye, center, up).Perspective(fovy, aspect, near, far)
+	done = timed("finding ideal camera position")
+	c := ribbon.PositionCamera(model, m)
+	done()
+
+	done = timed("writing mesh to disk")
+	mesh.SaveSTL(fmt.Sprintf(file_name + ".stl"))
+	done()
 
 	// render
-	shader := NewPhongShader(matrix, light, eye)
+	done = timed("rendering image")
+	context := NewContext(int(size*scale*c.Aspect), size*scale)
+	context.ClearColorBufferWith(HexColor("#FFFFFF"))
+	matrix := LookAt(c.Eye, c.Center, c.Up).Perspective(c.Fovy, c.Aspect, 1, 100)
+	light := c.Eye.Sub(c.Center).Normalize()
+	shader := NewPhongShader(matrix, light, c.Eye)
 	shader.AmbientColor = Gray(0.3)
 	shader.DiffuseColor = Gray(0.9)
 	context.Shader = shader
 	context.DrawTriangles(mesh.Triangles)
+	done()
 
 	// save image
+	done = timed("downsampling image")
 	image := context.Image()
-	image = resize.Resize(width, height, image, resize.Bilinear)
-	SavePNG("out.png", image)
+	image = resize.Resize(uint(size*c.Aspect), size, image, resize.Bilinear)
+	done()
+
+	done = timed("writing image to disk")
+	SavePNG(fmt.Sprintf(file_name + ".png"), image)
+	done()
 }

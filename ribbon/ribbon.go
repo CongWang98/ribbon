@@ -2,10 +2,10 @@ package ribbon
 
 import (
 	"math"
-
+	"fmt"
 	"github.com/fogleman/ease"
 	"github.com/fogleman/fauxgl"
-	"github.com/fogleman/ribbon/pdb"
+	"../pdb"
 )
 
 func ellipseProfile(n int, w, h float64) []fauxgl.Vector {
@@ -272,6 +272,9 @@ func createChainMesh(chain *pdb.Chain) *fauxgl.Mesh {
 		if plane != nil {
 			// TODO: better handling missing required atoms
 			planes = append(planes, plane)
+			fmt.Printf("%d", i)
+			fmt.Printf("%d", i+1)
+			fmt.Printf("%d\n", i+2)
 		}
 	}
 	var previous fauxgl.Vector
@@ -289,6 +292,10 @@ func createChainMesh(chain *pdb.Chain) *fauxgl.Mesh {
 		pp3 := planes[i+2]
 		pp4 := planes[i+3]
 		m := createSegmentMesh(i, n, pp1, pp2, pp3, pp4)
+		fmt.Printf("%d", i)
+		fmt.Printf("%d", i+1)
+		fmt.Printf("%d", i+2)
+		fmt.Printf("%d\n", i+3)
 		mesh.Add(m)
 	}
 	return mesh

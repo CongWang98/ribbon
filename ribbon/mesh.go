@@ -2,7 +2,7 @@ package ribbon
 
 import (
 	"github.com/fogleman/fauxgl"
-	"github.com/fogleman/ribbon/pdb"
+	"../pdb"
 )
 
 func ModelMesh(model *pdb.Model) *fauxgl.Mesh {

@@ -48,6 +48,6 @@ func ParseAtom(line string) *Atom {
 	atom.Z = parseFloat(line[46:54])
 	atom.Occupancy = parseFloat(line[54:60])
 	atom.TempFactor = parseFloat(line[60:66])
-	atom.Charge = parseString(line[78:80])
+	//atom.Charge = parseString(line[78:80])
 	return &atom
 }

@@ -10,8 +10,8 @@ import (
 	"time"
 
 	. "github.com/fogleman/fauxgl"
-	"github.com/fogleman/ribbon/pdb"
-	"github.com/fogleman/ribbon/ribbon"
+	"../../pdb"
+	"../../ribbon"
 	"github.com/nfnt/resize"
 )
 
