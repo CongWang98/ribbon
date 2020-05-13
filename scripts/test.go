@@ -34,14 +34,17 @@ func timed(name string) func() {
 	}
 }
 
-func main() {
-	pdb_file := "zhongjitest.pdb"
-	file_name := strings.Split(pdb_file,".")[0]
-	data, err := ioutil.ReadFile(pdb_file)
+func plot(pdbfile string){
+	//pdb_file := "zhongjitest.pdb"
+	fmt.Printf(pdbfile)
+	file_name := strings.Split(pdbfile,".")[0]
+	fmt.Printf("&&&&&&\n")
+	fmt.Printf(file_name)
+	fmt.Printf("&&&&&&\n")
+	data, err := ioutil.ReadFile(pdbfile)
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Println(string(data))
 	r := strings.NewReader(string(data))
 	models, err := pdb.NewReader(r).ReadAll()
 	if err != nil {
@@ -96,4 +99,20 @@ func main() {
 	done = timed("writing image to disk")
 	SavePNG(fmt.Sprintf(file_name + ".png"), image)
 	done()
+
+}
+
+
+func main() {
+	folderpath := "test"
+	dir, _ := ioutil.ReadDir(folderpath)
+	for _, fi := range dir {
+		filetype := strings.Split(fi.Name(),".")[1]
+		if filetype == "pdb"{
+			fmt.Printf("*****\n")
+			fmt.Printf(folderpath + "/" +fi.Name())
+			fmt.Printf("*****\n")
+			plot(folderpath + "/" +fi.Name())
+		}
+	}
 }
